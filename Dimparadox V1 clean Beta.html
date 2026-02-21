@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DimParadox System</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc, #ffcc00);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.screen {
+    text-align: center;
+    color: white;
+}
+
+button {
+    padding: 15px 30px;
+    margin: 8px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
+
+.connect-btn {
+    font-size: 24px;
+    background: linear-gradient(90deg, #00ffcc, #ff00cc);
+    color: white;
+}
+
+.menu {
+    display: none;
+}
+
+.system-btn {
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 240px;
+}
+
+.panel {
+    display: none;
+    margin-top: 20px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* =======================
+   CALCULATOR STYLING
+======================= */
+
+.calculator {
+    background: #111;
+    padding: 25px;
+    border-radius: 25px;
+    width: 340px;
+    margin: 20px auto;
+    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+}
+
+#calcDisplay {
+    width: 100%;
+    height: 80px;
+    font-size: 36px;
+    background: black;
+    color: #00ffcc;
+    text-align: right;
+    padding: 15px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    font-family: 'Courier New', monospace;
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.calc-grid button {
+    height: 70px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 15px;
+    background: #222;
+    color: white;
+    transition: 0.2s;
+}
+
+.calc-grid button:hover {
+    background: #333;
+    transform: scale(1.05);
+}
+
+.operator {
+    background: #ff9500 !important;
+}
+
+.equal {
+    background: #00c853 !important;
+}
+
+.clear {
+    background: #d50000 !important;
+    grid-column: span 4;
+}
+
+/* =======================
+   SOUNDBOARD
+======================= */
+
+.sound-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.sound-grid button {
+    padding: 15px;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="screen" id="startScreen">
+    <h1>Welcome To System</h1>
+    <button class="connect-btn" onclick="connectSystem()">Connect To System</button>
+</div>
+
+<div class="screen menu" id="menuScreen">
+    <h2>System Menu</h2>
+    <button class="system-btn" onclick="showCalculator()">Calculator</button><br>
+    <button class="system-btn" onclick="showSoundboard()">Soundboard</button>
+
+    <div class="panel" id="panel"></div>
+</div>
+
+<script>
+
+function connectSystem() {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("menuScreen").style.display = "block";
+}
+
+/* =======================
+   CALCULATOR LOGIC
+======================= */
+
+function showCalculator() {
+    let panel = document.getElementById("panel");
+    panel.style.display = "block";
+
+    panel.innerHTML = `
+    <div class="calculator">
+        <input type="text" id="calcDisplay" readonly>
+
+        <div class="calc-grid">
+            <button onclick="press('7')">7</button>
+            <button onclick="press('8')">8</button>
+            <button onclick="press('9')">9</button>
+            <button class="operator" onclick="press('/')">÷</button>
+
+            <button onclick="press('4')">4</button>
+            <button onclick="press('5')">5</button>
+            <button onclick="press('6')">6</button>
+            <button class="operator" onclick="press('*')">×</button>
+
+            <button onclick="press('1')">1</button>
+            <button onclick="press('2')">2</button>
+            <button onclick="press('3')">3</button>
+            <button class="operator" onclick="press('-')">−</button>
+
+            <button onclick="press('0')">0</button>
+            <button onclick="press('.')">.</button>
+            <button class="equal" onclick="calculateFull()">=</button>
+            <button class="operator" onclick="press('+')">+</button>
+
+            <button class="clear" onclick="clearDisplay()">CLEAR</button>
+        </div>
+    </div>
+    `;
+}
+
+function press(value) {
+    document.getElementById("calcDisplay").value += value;
+}
+
+function clearDisplay() {
+    document.getElementById("calcDisplay").value = "";
+}
+
+function calculateFull() {
+    let display = document.getElementById("calcDisplay");
+    try {
+        if (!/^[0-9+\-*/.]+$/.test(display.value)) {
+            display.value = "Error";
+            return;
+        }
+        display.value = Function('"use strict";return (' + display.value + ')')();
+    } catch {
+        display.value = "Error";
+    }
+}
+
+/* =======================
+   SOUNDBOARD LOGIC
+======================= */
+
+function showSoundboard() {
+    let panel = document.getElementById("panel");
+    panel.style.display = "block";
+
+    panel.innerHTML = `
+        <h3>Soundboard</h3>
+        <div class="sound-grid">
+            <button onclick="playSound('sound1.mp3')">Sound 1</button>
+            <button onclick="playSound('sound2.mp3')">Sound 2</button>
+            <button onclick="playSound('sound3.mp3')">Sound 3</button>
+            <button onclick="playSound('sound4.mp3')">Sound 4</button>
+            <button onclick="playSound('sound5.mp3')">Sound 5</button>
+            <button onclick="playSound('sound6.mp3')">Sound 6</button>
+            <button onclick="playSound('sound7.mp3')">Sound 7</button>
+            <button onclick="playSound('sound8.mp3')">Sound 8</button>
+            <button onclick="playSound('sound9.mp3')">Sound 9</button>
+            <button onclick="playSound('sound10.mp3')">Sound 10</button>
+        </div>
+    `;
+}
+
+function playSound(file) {
+    let audio = new Audio(file);
+    audio.play();
+}
+
+</script>
+
+</body>
+</html>
